@@ -191,6 +191,7 @@ int main(void)
   printf("16 bit data SRC to 16 bit SRAM\n");
 #else
   printf("32 bit data SRC to 16 bit SRAM\n");
+  printf("WARNING : only the 16 least significant bits are copied to SRAM");
 #endif
 
 #ifdef USE_SRAM
