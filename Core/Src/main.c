@@ -76,7 +76,7 @@ SRAM_HandleTypeDef hsram2;
 /* USER CODE BEGIN PV */
 #define BUFFER_SIZE              32
 
-//#define SRC16bits
+#define SRC16bits
 #ifdef SRC16bits
 static uint16_t aSRC_Buffer[BUFFER_SIZE];
 #else
