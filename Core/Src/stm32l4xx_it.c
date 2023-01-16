@@ -56,6 +56,8 @@
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_OTG_FS;
+extern DMA_HandleTypeDef hdma_dcmi;
+extern DCMI_HandleTypeDef hdcmi;
 extern DMA_HandleTypeDef hdma_memtomem_dma1_channel1;
 /* USER CODE BEGIN EV */
 
@@ -214,6 +216,20 @@ void DMA1_Channel1_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles DMA2 channel5 global interrupt.
+  */
+void DMA2_Channel5_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA2_Channel5_IRQn 0 */
+
+  /* USER CODE END DMA2_Channel5_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_dcmi);
+  /* USER CODE BEGIN DMA2_Channel5_IRQn 1 */
+
+  /* USER CODE END DMA2_Channel5_IRQn 1 */
+}
+
+/**
   * @brief This function handles USB OTG FS global interrupt.
   */
 void OTG_FS_IRQHandler(void)
@@ -225,6 +241,20 @@ void OTG_FS_IRQHandler(void)
   /* USER CODE BEGIN OTG_FS_IRQn 1 */
 
   /* USER CODE END OTG_FS_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DCMI global interrupt.
+  */
+void DCMI_IRQHandler(void)
+{
+  /* USER CODE BEGIN DCMI_IRQn 0 */
+
+  /* USER CODE END DCMI_IRQn 0 */
+  HAL_DCMI_IRQHandler(&hdcmi);
+  /* USER CODE BEGIN DCMI_IRQn 1 */
+
+  /* USER CODE END DCMI_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

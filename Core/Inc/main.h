@@ -47,8 +47,6 @@ extern "C" {
 #define DMA_INSTANCE_IRQ           DMA1_Channel1_IRQn
 #define DMA_INSTANCE_IRQHANDLER    DMA1_Channel1_IRQHandler
 
-#define BUFFER_SIZE              32
-
 #define SRAM_BANK_ADDR      ((uint32_t)0x64000000)
 #define WRITE_READ_ADDR     ((uint32_t)0x25800)
 

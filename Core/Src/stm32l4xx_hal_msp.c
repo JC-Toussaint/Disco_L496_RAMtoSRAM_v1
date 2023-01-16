@@ -23,6 +23,7 @@
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
+extern DMA_HandleTypeDef hdma_dcmi;
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
@@ -304,6 +305,27 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* hdcmi)
     GPIO_InitStruct.Alternate = GPIO_AF10_DCMI;
     HAL_GPIO_Init(DCMI_D6_GPIO_Port, &GPIO_InitStruct);
 
+    /* DCMI DMA Init */
+    /* DCMI Init */
+    hdma_dcmi.Instance = DMA2_Channel5;
+    hdma_dcmi.Init.Request = DMA_REQUEST_4;
+    hdma_dcmi.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_dcmi.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_dcmi.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_dcmi.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_dcmi.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_dcmi.Init.Mode = DMA_CIRCULAR;
+    hdma_dcmi.Init.Priority = DMA_PRIORITY_HIGH;
+    if (HAL_DMA_Init(&hdma_dcmi) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    __HAL_LINKDMA(hdcmi,DMA_Handle,hdma_dcmi);
+
+    /* DCMI interrupt Init */
+    HAL_NVIC_SetPriority(DCMI_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DCMI_IRQn);
   /* USER CODE BEGIN DCMI_MspInit 1 */
 
   /* USER CODE END DCMI_MspInit 1 */
@@ -347,6 +369,11 @@ void HAL_DCMI_MspDeInit(DCMI_HandleTypeDef* hdcmi)
 
     HAL_GPIO_DeInit(DCMI_D6_GPIO_Port, DCMI_D6_Pin);
 
+    /* DCMI DMA DeInit */
+    HAL_DMA_DeInit(hdcmi->DMA_Handle);
+
+    /* DCMI interrupt DeInit */
+    HAL_NVIC_DisableIRQ(DCMI_IRQn);
   /* USER CODE BEGIN DCMI_MspDeInit 1 */
 
   /* USER CODE END DCMI_MspDeInit 1 */

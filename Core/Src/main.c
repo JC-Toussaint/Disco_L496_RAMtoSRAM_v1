@@ -47,6 +47,7 @@ ADC_HandleTypeDef hadc2;
 ADC_HandleTypeDef hadc3;
 
 DCMI_HandleTypeDef hdcmi;
+DMA_HandleTypeDef hdma_dcmi;
 
 DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
 DFSDM_Channel_HandleTypeDef hdfsdm1_channel2;
@@ -74,7 +75,14 @@ SRAM_HandleTypeDef hsram2;
 
 /* USER CODE BEGIN PV */
 #define BUFFER_SIZE              32
+
+//#define SRC16bits
+#ifdef SRC16bits
 static uint16_t aSRC_Buffer[BUFFER_SIZE];
+#else
+static uint32_t aSRC_Buffer[BUFFER_SIZE];
+#endif
+
 #ifndef USE_SRAM
 static uint16_t aDST_Buffer[BUFFER_SIZE];
 #endif
@@ -131,7 +139,11 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
   	for(__IO uint32_t  uwIndex = 0; uwIndex < BUFFER_SIZE; uwIndex++){
+#ifdef SRC16bits
   		aSRC_Buffer[uwIndex]=uwIndex;
+#else
+  		aSRC_Buffer[uwIndex]=0xffff0000 | uwIndex;
+#endif
   	}
   /* USER CODE END 1 */
 
@@ -175,6 +187,11 @@ int main(void)
   MX_USB_DEVICE_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
+#ifdef SRC16bits
+  printf("16 bit data SRC to 16 bit SRAM\n");
+#else
+  printf("32 bit data SRC to 16 bit SRAM\n");
+#endif
 
 #ifdef USE_SRAM
 	/* Write data to the SRAM memory */
@@ -264,7 +281,7 @@ int main(void)
 #else
 	  		__IO uint16_t uval = aDST_Buffer[uwIndex];
 #endif
-	  		if (uval != aSRC_Buffer[uwIndex]) Error_Handler();
+	  		if (uval != (aSRC_Buffer[uwIndex] & 0x0000ffff)) Error_Handler();
 
 	  		printf("%lu %u\n", uwIndex, uval);
 	  	}
@@ -1073,6 +1090,7 @@ static void MX_DMA_Init(void)
 
   /* DMA controller clock enable */
   __HAL_RCC_DMA1_CLK_ENABLE();
+  __HAL_RCC_DMA2_CLK_ENABLE();
 
   /* Configure DMA request hdma_memtomem_dma1_channel1 on DMA1_Channel1 */
   hdma_memtomem_dma1_channel1.Instance = DMA1_Channel1;
@@ -1080,7 +1098,13 @@ static void MX_DMA_Init(void)
   hdma_memtomem_dma1_channel1.Init.Direction = DMA_MEMORY_TO_MEMORY;
   hdma_memtomem_dma1_channel1.Init.PeriphInc = DMA_PINC_ENABLE;
   hdma_memtomem_dma1_channel1.Init.MemInc = DMA_MINC_ENABLE;
+
+#ifdef SRC16bits
   hdma_memtomem_dma1_channel1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+#else
+  hdma_memtomem_dma1_channel1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+#endif
+
   hdma_memtomem_dma1_channel1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
   hdma_memtomem_dma1_channel1.Init.Mode = DMA_NORMAL;
   hdma_memtomem_dma1_channel1.Init.Priority = DMA_PRIORITY_HIGH;
@@ -1093,6 +1117,9 @@ static void MX_DMA_Init(void)
   /* DMA1_Channel1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
+  /* DMA2_Channel5_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Channel5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Channel5_IRQn);
 
 }
 
